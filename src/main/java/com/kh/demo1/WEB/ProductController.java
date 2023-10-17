@@ -131,36 +131,25 @@ public class ProductController {
         @PathVariable("id") Long productId,
         @Valid @ModelAttribute UpdateForm updateForm,
         BindingResult bindingResult,
-        RedirectAttributes redirectAttributes){
-        log.info("update()호출됨!");
+        RedirectAttributes redirectAttributes
+    ){
+        log.info("update() 호출됨!");
         log.info("updateForm={}",updateForm);
+
         // 요청데이터 유효성 체크
         // 1. 어노테이션 기반 필드 검증
         if(bindingResult.hasErrors()){
             log.info("bindingResult={}", bindingResult);
             return "product/updateForm";
         }
-        // 2. 코드 기반 필드 및 글로벌 오류(필드2개이상) 검증
-        // 2.1 필드오류 , 상품수량 1000 초과 불가
-        if(updateForm.getQuantity() > 1000) {
-            bindingResult.rejectValue("quantity","product",new Object[]{1000},null);
-        }
-        // 2.2 글로벌오류, 총액(상품수량 * 단가) 1억원 초과 금지
-        if(updateForm.getQuantity() * updateForm.getPrice() > 100_000_000L) {
-            bindingResult.reject("totalPrice",new Object[]{1000},null);
-        }
-        if(bindingResult.hasErrors()){
-            log.info("bindingResult={}", bindingResult);
-            return "product/updateForm";
-        }
-        //상품수정
+        // 상품수정
         Product product = new Product();
         product.setPname(updateForm.getPname());
         product.setQuantity(updateForm.getQuantity());
         product.setPrice(updateForm.getPrice());
         int updatedRow = productSVC.updatedById(productId, product);
         //상품조회 리다이렉트
-        redirectAttributes.addAttribute("id",productId);
+        redirectAttributes.addAttribute("id", productId);
         return "redirect:/products/{id}/detail";
     }
 }
